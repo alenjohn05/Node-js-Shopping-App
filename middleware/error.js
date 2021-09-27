@@ -6,7 +6,7 @@ const errorHandler = (err, req, res, next)=>{
 
     console.log(err)
 
-    if(err.code === 11000){   ///In mongoose this means the duplicate error key
+    if(err.code === 11000){
         const message = 'Duplicate Feild Value Enter';
         error = new ErrorResponse(message, 400);
     }
