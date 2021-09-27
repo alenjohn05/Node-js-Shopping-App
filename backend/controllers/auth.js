@@ -33,28 +33,21 @@ exports.login =
     try {
       const user = await User.findOne({ email }).select("+password");
       if (!user) {
-        res.status(404).json({
-          success: false,
-          error: "invalid Credentials",
-        });
+        return next(new ErrorResponse("invalid Credentials", 404));
       }
       const isMatch = await user.matchPasswords(password);
       if (!isMatch) {
-        res.status(401).json({
-          success: false,
-          error: "Invalid Credentials",
-        });
+        return next(new ErrorResponse("invalid Credentials", 404));
       }
 
       sentToken(user, 201, res);
     } catch (error) {
-      res.status(501).json({
-        success: false,
-        error: error.message,
-      });
+      next(error);
     }
   });
 
+
+//SentToken Response
 const sentToken = (user, statusCode, res) => {
   const token = user.getSignedToken();
   res.status(200).json({

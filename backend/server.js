@@ -22,11 +22,12 @@ app.use((req, res, next) => {
 
 const authRouter = require("./routes/auth");
 const privateRouter = require("./routes/private");
+const productRoutes = require("./routes/product");
 
 app.use("/api/auth", authRouter);
 app.use("/api/private", privateRouter);
 
-
+app.use("/api/products", productRoutes);
 
 
 app.use(errorHandler);
