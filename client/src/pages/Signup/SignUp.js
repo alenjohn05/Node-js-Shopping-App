@@ -1,66 +1,74 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie";
+import axios from "axios";
 import "./SignUp.css";
 
 class SignUp extends Component {
-  state= {
+  state = {
     username: "",
     email: "",
     password: "",
     showSubmitError: false,
-    errorMsg: '',
-  }
+    errorMsg: "",
+  };
 
-  onChangeUsername = event => {
-    this.setState({username: event.target.value})
-  }
+  onChangeUsername = (event) => {
+    this.setState({ username: event.target.value });
+  };
 
-  onChangePassword = event => {
-    this.setState({password: event.target.value})
-  }
+  onChangePassword = (event) => {
+    this.setState({ password: event.target.value });
+  };
 
-  onChangeEmail = event => {
-    this.setState({email: event.target.value})
-  }
+  onChangeEmail = (event) => {
+    this.setState({ email: event.target.value });
+  };
 
-  onSubmitSuccess = jwtToken => {
-    const {history} = this.props
-
-    Cookies.set('jwt_token', jwtToken, {
+  onSubmitSuccess = (jwtToken) => {
+    const { history } = this.props;
+    Cookies.set("jwt_token", jwtToken, {
       expires: 30,
-      path: '/',
-    })
-    history.replace('/')
-  }
+      path: "/",
+    });
+    history.replace("/");
+    this.setState({ email: "", password: "", username: "" });
+  };
 
-  onSubmitFailure = errorMsg => {
-    console.log(errorMsg)
-    this.setState({showSubmitError: true, errorMsg})
-  }
+  onSubmitFailure = (errorMsg) => {
+    this.setState({
+      showSubmitError: true,
+      errorMsg,
+    });
+  };
 
-
-  onSubmitData=async(e)=>{
-    e.preventDefault();
-    const {username, password, email} = this.state;
-    const userDetails = {username, password,email}
-    const url = 'http://localhost:5003/api/auth/register'
-    const options = {
-      method: 'POST',
-      body: JSON.stringify(userDetails)
+  onSubmitData = async (event) => {
+    event.preventDefault();
+    const { username, password, email } = this.state;
+    const config = {
+      header: {
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      const { data } = await axios.post(
+        "http://localhost:5003/api/auth/register",
+        {
+          username,
+          email,
+          password,
+        },
+        config
+      );
+      this.onSubmitSuccess(data.jwt_token);
+    } catch (error) {
+      const { data } = error.response;
+      this.onSubmitFailure(data.error);
     }
-    const response = await fetch(url, options)
-    const data = await response.json()
-    if (response.ok === true) {
-      this.onSubmitSuccess(data.jwt_token)
-    } else {
-      this.onSubmitFailure(data.error_msg)
-    }
-
-  }
+  };
 
   render() {
-    const {showSubmitError, errorMsg} = this.state
+    const { username, password, email, showSubmitError, errorMsg } = this.state;
     return (
       <div className="sign-page">
         <div className="signup-form">
@@ -73,7 +81,7 @@ class SignUp extends Component {
                   <input
                     type="text"
                     className="form-control"
-                    name="username"
+                    value={username}
                     placeholder="Name"
                     onChange={this.onChangeUsername}
                   />
@@ -84,7 +92,7 @@ class SignUp extends Component {
               <input
                 type="email"
                 className="form-control"
-                name="email"
+                value={email}
                 placeholder="Email"
                 onChange={this.onChangeEmail}
               />
@@ -93,8 +101,8 @@ class SignUp extends Component {
               <input
                 type="password"
                 className="form-control"
-                name="password"
                 placeholder="Password"
+                value={password}
                 onChange={this.onChangePassword}
               />
             </div>
@@ -102,11 +110,15 @@ class SignUp extends Component {
               <button type="submit" className="btn btn-primary btn-lg">
                 Sign Up
               </button>
-              {showSubmitError && <p className="error-message">*{errorMsg}</p>}
+              {showSubmitError && (
+                <div className="err-div">
+                  <p className="error-message">{errorMsg}</p>
+                </div>
+              )}
             </div>
           </form>
           <div className="hint-text">
-            Already have an account? <Link to='/login'>Login here</Link>
+            Already have an account? <Link to="/login">Login here</Link>
           </div>
         </div>
       </div>

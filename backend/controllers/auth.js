@@ -4,11 +4,8 @@ const ErrorResponse = require("../middleware/error");
 
 //REGISTER
 
-exports.register =
-  ("/",
-  async (req, res, next) => {
+exports.register =async (req, res, next) => {
     const { username, email, password } = req.body;
-    console.log(req.body)
     try {
       const user = await User.create({
         username,
@@ -19,7 +16,7 @@ exports.register =
     } catch (error) {
       next(error);
     }
-  });
+  };
 
 //LOGIN
 
@@ -53,6 +50,6 @@ const sentToken = (user, statusCode, res) => {
   const token = user.getSignedToken();
   res.status(200).json({
     success: true,
-    jwttoken: token,
+    jwt_token: token,
   });
 };

@@ -4,30 +4,24 @@ const express = require("express");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/error");
 var bodyParser = require('body-parser')
+const cors = require('cors')
 const app = express();
 
 //Connect DB
 connectDB();
 
 const authRouter = require("./routes/auth");
-const privateRouter = require("./routes/private");
 const productRoutes = require("./routes/product");
+const cartRoutes = require("./routes/cart");
 
-
-// CORS
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
-app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }))
+// CORS
+app.use(cors());
 
 app.use("/api/auth", authRouter);
-app.use("/api/private", privateRouter);
-
 app.use("/api/products", productRoutes);
+app.use("/api/cart",cartRoutes);
 
 app.use(errorHandler);
 
